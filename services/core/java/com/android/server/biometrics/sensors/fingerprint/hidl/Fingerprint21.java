@@ -705,20 +705,21 @@ public class Fingerprint21 implements IHwBinder.DeathRecipient, ServiceProvider 
 
     private void scheduleInternalCleanup(int userId,
             @Nullable BaseClientMonitor.Callback callback) {
-        if (!mCleanup) {
-            return;
-        }
-        mHandler.post(() -> {
-            scheduleUpdateActiveUserWithoutHandler(userId);
+            if (mCleanup) {
+                mHandler.post(() -> {
+                    scheduleUpdateActiveUserWithoutHandler(userId);
 
-            final List<Fingerprint> enrolledList = getEnrolledFingerprints(
-                    mSensorProperties.sensorId, userId);
-            final FingerprintInternalCleanupClient client = new FingerprintInternalCleanupClient(
-                    mContext, mLazyDaemon, userId, mContext.getOpPackageName(),
-                    mSensorProperties.sensorId, enrolledList,
-                    FingerprintUtils.getLegacyInstance(mSensorId), mAuthenticatorIds);
-            mScheduler.scheduleClientMonitor(client, callback);
-        });
+                    final List<Fingerprint> enrolledList = getEnrolledFingerprints(
+                            mSensorProperties.sensorId, userId);
+                    final FingerprintInternalCleanupClient client =
+                            new FingerprintInternalCleanupClient(
+                                    mContext, mLazyDaemon, userId, mContext.getOpPackageName(),
+                                    mSensorProperties.sensorId, enrolledList,
+                                    FingerprintUtils.getLegacyInstance(mSensorId),
+                                    mAuthenticatorIds);
+                    mScheduler.scheduleClientMonitor(client, callback);
+                });
+        }
     }
 
     @Override
